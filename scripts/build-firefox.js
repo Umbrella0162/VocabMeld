@@ -128,7 +128,7 @@ function generateFirefoxManifest() {
     // Firefox 特定设置
     browser_specific_settings: {
       gecko: {
-        id: 'vocabmeld@vocabmeld.com',
+        id: '{ac6b2052-504c-4134-9ea1-3a002f7c6448}',
         strict_min_version: '140.0',
         data_collection_permissions: {
           required: ['none']

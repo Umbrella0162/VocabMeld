@@ -185,23 +185,54 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 渲染词汇列表
   function renderWordList(container, words, type) {
     if (words.length === 0) {
-      container.innerHTML = '<div class="empty-list">暂无词汇</div>';
+      container.textContent = '';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'empty-list';
+      emptyDiv.textContent = '暂无词汇';
+      container.appendChild(emptyDiv);
       return;
     }
 
-    container.innerHTML = words.map(w => `
-      <div class="word-item">
-        <span class="word-original">${w.original}</span>
-        ${w.word ? `<span class="word-translation">${w.word}</span>` : ''}
-        ${w.difficulty ? `<span class="word-difficulty difficulty-${w.difficulty.toLowerCase()}">${w.difficulty}</span>` : ''}
-        <span class="word-date">${formatDate(w.addedAt)}</span>
-        ${type !== 'cached' ? `<button class="word-remove" data-word="${w.original}" data-type="${type}">&times;</button>` : ''}
-      </div>
-    `).join('');
+    container.textContent = '';
+    words.forEach(w => {
+      const wordItem = document.createElement('div');
+      wordItem.className = 'word-item';
 
-    // 绑定删除事件
-    container.querySelectorAll('.word-remove').forEach(btn => {
-      btn.addEventListener('click', () => removeWord(btn.dataset.word, btn.dataset.type));
+      const originalSpan = document.createElement('span');
+      originalSpan.className = 'word-original';
+      originalSpan.textContent = w.original;
+      wordItem.appendChild(originalSpan);
+
+      if (w.word) {
+        const translationSpan = document.createElement('span');
+        translationSpan.className = 'word-translation';
+        translationSpan.textContent = w.word;
+        wordItem.appendChild(translationSpan);
+      }
+
+      if (w.difficulty) {
+        const difficultySpan = document.createElement('span');
+        difficultySpan.className = `word-difficulty difficulty-${w.difficulty.toLowerCase()}`;
+        difficultySpan.textContent = w.difficulty;
+        wordItem.appendChild(difficultySpan);
+      }
+
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'word-date';
+      dateSpan.textContent = formatDate(w.addedAt);
+      wordItem.appendChild(dateSpan);
+
+      if (type !== 'cached') {
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'word-remove';
+        removeBtn.dataset.word = w.original;
+        removeBtn.dataset.type = type;
+        removeBtn.textContent = '×';
+        removeBtn.addEventListener('click', () => removeWord(w.original, type));
+        wordItem.appendChild(removeBtn);
+      }
+
+      container.appendChild(wordItem);
     });
   }
 

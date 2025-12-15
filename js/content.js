@@ -372,28 +372,39 @@
     wrapper.setAttribute('data-translation', translation);
     wrapper.setAttribute('data-phonetic', phonetic || '');
     wrapper.setAttribute('data-difficulty', difficulty || 'B1');
-    
-    // 根据配置的样式生成不同的HTML
+
+    // 根据配置的样式生成不同的元素
     const style = config.translationStyle || 'translation-original';
-    let innerHTML = '';
-    
+
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'vocabmeld-word';
+
+    const originalSpan = document.createElement('span');
+    originalSpan.className = 'vocabmeld-original';
+
     switch (style) {
       case 'translation-only':
         // 只显示译文
-        innerHTML = `<span class="vocabmeld-word">${translation}</span>`;
+        wordSpan.textContent = translation;
+        wrapper.appendChild(wordSpan);
         break;
       case 'original-translation':
         // 原文(译文)
-        innerHTML = `<span class="vocabmeld-original">${original}</span><span class="vocabmeld-word">(${translation})</span>`;
+        originalSpan.textContent = original;
+        wordSpan.textContent = `(${translation})`;
+        wrapper.appendChild(originalSpan);
+        wrapper.appendChild(wordSpan);
         break;
       case 'translation-original':
       default:
         // 译文(原文) - 默认样式
-        innerHTML = `<span class="vocabmeld-word">${translation}</span><span class="vocabmeld-original">(${original})</span>`;
+        wordSpan.textContent = translation;
+        originalSpan.textContent = `(${original})`;
+        wrapper.appendChild(wordSpan);
+        wrapper.appendChild(originalSpan);
         break;
     }
-    
-    wrapper.innerHTML = innerHTML;
+
     return wrapper;
   }
 
@@ -1257,15 +1268,40 @@ ${uncached.join(', ')}
     const phonetic = element.getAttribute('data-phonetic');
     const difficulty = element.getAttribute('data-difficulty');
 
-    tooltip.innerHTML = `
-      <div class="vocabmeld-tooltip-header">
-        <span class="vocabmeld-tooltip-word">${translation}</span>
-        <span class="vocabmeld-tooltip-badge">${difficulty}</span>
-      </div>
-      ${phonetic && config.showPhonetic ? `<div class="vocabmeld-tooltip-phonetic">${phonetic}</div>` : ''}
-      <div class="vocabmeld-tooltip-original">原文: ${original}</div>
-      <div class="vocabmeld-tooltip-tip">左键点击发音 · 右键标记已学会</div>
-    `;
+    // 使用安全的 DOM 操作替代 innerHTML
+    tooltip.textContent = '';
+
+    const header = document.createElement('div');
+    header.className = 'vocabmeld-tooltip-header';
+
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'vocabmeld-tooltip-word';
+    wordSpan.textContent = translation;
+    header.appendChild(wordSpan);
+
+    const badgeSpan = document.createElement('span');
+    badgeSpan.className = 'vocabmeld-tooltip-badge';
+    badgeSpan.textContent = difficulty;
+    header.appendChild(badgeSpan);
+
+    tooltip.appendChild(header);
+
+    if (phonetic && config.showPhonetic) {
+      const phoneticDiv = document.createElement('div');
+      phoneticDiv.className = 'vocabmeld-tooltip-phonetic';
+      phoneticDiv.textContent = phonetic;
+      tooltip.appendChild(phoneticDiv);
+    }
+
+    const originalDiv = document.createElement('div');
+    originalDiv.className = 'vocabmeld-tooltip-original';
+    originalDiv.textContent = '原文: ' + original;
+    tooltip.appendChild(originalDiv);
+
+    const tipDiv = document.createElement('div');
+    tipDiv.className = 'vocabmeld-tooltip-tip';
+    tipDiv.textContent = '左键点击发音 · 右键标记已学会';
+    tooltip.appendChild(tipDiv);
 
     const rect = element.getBoundingClientRect();
     tooltip.style.left = rect.left + window.scrollX + 'px';

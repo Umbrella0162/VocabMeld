@@ -153,10 +153,18 @@ class TextReplacer {
     wrapper.setAttribute('data-translation', translation);
     wrapper.setAttribute('data-phonetic', phonetic || '');
     wrapper.setAttribute('data-difficulty', difficulty || 'B1');
-    
-    // 显示格式: translated(original)
-    wrapper.innerHTML = `<span class="vocabmeld-word">${translation}</span><span class="vocabmeld-original">(${original})</span>`;
-    
+
+    // 使用安全的 DOM 操作替代 innerHTML
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'vocabmeld-word';
+    wordSpan.textContent = translation;
+    wrapper.appendChild(wordSpan);
+
+    const originalSpan = document.createElement('span');
+    originalSpan.className = 'vocabmeld-original';
+    originalSpan.textContent = `(${original})`;
+    wrapper.appendChild(originalSpan);
+
     return wrapper;
   }
 
